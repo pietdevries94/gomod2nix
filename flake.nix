@@ -36,7 +36,7 @@
 
           inherit (callPackage ./builder {
             inherit gomod2nix;
-          }) mkGoEnv buildGoApplication;
+          }) mkGoEnv buildGoApplication mkVendorEnv;
           gomod2nix = callPackage ./default.nix {
             inherit mkGoEnv buildGoApplication;
           };
@@ -45,7 +45,7 @@
           packages.default = gomod2nix;
           legacyPackages = {
             # we cannot put them in packages because they are builder functions
-            inherit mkGoEnv buildGoApplication;
+            inherit mkGoEnv buildGoApplication mkVendorEnv;
             # just have this here for convenience
             inherit gomod2nix;
           };

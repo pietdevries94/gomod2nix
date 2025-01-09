@@ -434,7 +434,30 @@ let
         inherit meta;
       });
 
+  mkVendorEnvExt =
+    { modules ? pwd + "/gomod2nix.toml"
+    , pwd ? null
+    , ...
+    }@attrs:
+    let
+      modulesStruct = if modules == null then { } else fromTOML (readFile modules);
+
+      goModPath = "${toString pwd}/go.mod";
+
+      goMod =
+        if pwd != null && pathExists goModPath
+        then parseGoMod (readFile goModPath)
+        else null;
+
+      go = selectGo attrs goMod;
+
+      defaultPackage = modulesStruct.goPackagePath or "";
+    in
+    mkVendorEnv {
+        inherit go modulesStruct defaultPackage goMod pwd;
+      };
 in
 {
   inherit buildGoApplication mkGoEnv;
+  mkVendorEnv = mkVendorEnvExt;
 }
